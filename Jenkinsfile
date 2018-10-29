@@ -1,10 +1,11 @@
 pipeline {
-    agent any
+    agent {dockerfile true}
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building..'
+		sh 'sudo docker build -t javatestapp:v1 .'
             }
         }
         stage('Test') {
