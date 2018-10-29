@@ -1,0 +1,5 @@
+com/relevancelab/todo/model/Task.class
+com/relevancelab/todo/repository/TaskRepository.class
+com/relevancelab/todo/controller/TaskController.class
+com/relevancelab/todo/ResourseNotFoundException/ResourseNotFoundException.class
+com/relevancelab/todo/ToDoListApplication.class
