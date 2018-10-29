@@ -8,7 +8,7 @@ pipeline {
 		sh 'docker build -t javatestapp:v2 .'
 		sh 'kubectl run testing --image=javatestapp:v2 --port=8080'
 		sh 'kubectl create deployment app --image=javatestapp:v2'
-       	      sh 'sudo kubectl expose deployment app --type=LoadBalancer'
+       	      sh 'sudo kubectl expose deployment app --type=LoadBalancer --port=8080'
             }
         }
         stage('Test') {
