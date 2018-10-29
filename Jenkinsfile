@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building..'
-		sh 'sudo docker build -t javatestapp:v2 .'
+		sh 'docker build -t javatestapp:v2 .'
             }
         }
         stage('Test') {
