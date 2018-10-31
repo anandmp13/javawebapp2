@@ -1,33 +1,39 @@
-pipeline {
+ipipeline {
     agent any
-
+    environment {
+        DOCKER_IMAGE_NAME = "anandmp/javatestapp"
+    }
     stages {
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Building..'
-		script {
-              def userInput = input(
-                id: 'userInput', message: 'Let\'s promote?', parameters: [
-                [$class: 'TextParameterDefinition', defaultValue: 'latest', description: 'Environment', name: 'env']
-                ])
-              echo ("Env: "+userInput)
-	      sh "docker build -t anandmp13/javatestapp:" + userInput + " ."
-	      sh "docker login -u=anandmp13 -p=Anandmp@1994"
-	      sh "docker tag anandmp13/javatestapp:"+userInput+ " anandmp13/javatestapp:latest"
-              sh 'docker push anandmp13/javatestapp'
-	      sh 'sudo kubectl rolling-update app --image=anandmp13/javatestapp:latest'
-	      sh 'sudo kubectl expose deployment app --type=LoadBalancer --port=8080'
-            }
+                script {
+                    app = docker.build(DOCKER_IMAGE_NAME)
+                    app.inside {
+                        sh 'echo Hello, World!'
+                    }
+                }
             }
         }
-        stage('Test') {
+        stage('Push Docker Image') {
             steps {
-                echo 'Testing..'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                       }
+                }
             }
         }
-        stage('Deploy') {
+        stage('DeployToProduction') {
             steps {
-                echo 'Deploying....'
+                input 'Deploy to Dev Environment?'
+                milestone(1)
+                kubernetesDeploy(
+                    credentialsType: 'KubeConfig',
+                    kubeConfig: [path: '/var/lib/jenkins/workspace/.kube/config'],
+                    configs: 'train-schedule-kube.yml',
+                    enableConfigSubstitution: true
+                )
             }
         }
     }
