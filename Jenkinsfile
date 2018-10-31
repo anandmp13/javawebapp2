@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE_NAME = "anandmp/javatestapp"
+        DOCKER_IMAGE_NAME = "anandmp13/javatestapp"
     }
     stages {
         stage('Build Docker Image') {
