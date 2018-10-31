@@ -1,39 +1,33 @@
 pipeline {
     agent any
-    environment {
-        DOCKER_IMAGE_NAME = "anandmp13/javatestapp"
-    }
+
     stages {
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
+                echo 'Building..'
                 script {
-                    app = docker.build(DOCKER_IMAGE_NAME)
-                    app.inside {
-                        sh 'echo Hello, World!'
-                    }
-                }
+              def userInput = input(
+                id: 'userInput', message: 'Let\'s promote?', parameters: [
+                [$class: 'TextParameterDefinition', defaultValue: 'latest', description: 'Environment', name: 'env']
+                ])
+              echo ("Env: "+userInput)
+              sh "docker build -t anandmp13/javatestapp:" + userInput + " ."
+              sh "docker login -u=anandmp13 -p=Anandmp@1994"
+              sh "docker tag anandmp13/javatestapp:"+userInput+ " anandmp13/javatestapp:latest"
+              sh 'docker push anandmp13/javatestapp'
+              sh 'sudo kubectl rolling-update app --image=anandmp13/javatestapp:latest'
+              sh 'sudo kubectl expose deployment app --type=LoadBalancer --port=8080'
+            }
             }
         }
-        stage('Push Docker Image') {
+        stage('Test') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker_hub_login') {
-                        app.push("${env.BUILD_NUMBER}")
-                        app.push("latest")
-                       }
-                }
+                echo 'Testing..'
             }
         }
-        stage('DeployToProduction') {
+        stage('Deploy') {
             steps {
-                input 'Deploy to Dev Environment?'
-                milestone(1)
-                kubernetesDeploy(
-                    credentialsType: 'KubeConfig',
-                    kubeConfig: [path: '/var/lib/jenkins/workspace/.kube/config'],
-                    configs: 'train-schedule-kube.yml',
-                    enableConfigSubstitution: true
-                )
+                echo 'Deploying....'
             }
         }
     }
