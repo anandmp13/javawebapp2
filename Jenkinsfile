@@ -15,7 +15,7 @@ pipeline {
               sh "docker login -u=anandmp13 -p=Anandmp@1994"
               sh "docker tag anandmp13/javatestapp:"+userInput+ " anandmp13/javatestapp:latest"
               sh 'docker push anandmp13/javatestapp'
-	      sh 'kubectl create deployment app --image=anandmp13/javatestapp:latest'
+	      sh 'kubectl update deployment app --image=anandmp13/javatestapp:latest'
               sh 'sudo kubectl expose deployment app --type=LoadBalancer --port=8080'
             }
             }
