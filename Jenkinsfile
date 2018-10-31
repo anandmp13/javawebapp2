@@ -1,4 +1,4 @@
-ipipeline {
+pipeline {
     agent any
     environment {
         DOCKER_IMAGE_NAME = "anandmp/javatestapp"
