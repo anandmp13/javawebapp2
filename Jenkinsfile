@@ -8,7 +8,7 @@ pipeline {
             steps {
                 script {
                     app = docker.build(DOCKER_IMAGE_NAME)
-		    copyArtifacts(projectName: 'DOCKER_IMAGE_NAME', lastSuccessful: specific("${env.BUILD_NUMBER}"));
+		    copyArtifacts(projectName: test, lastSuccessful: specific("${env.BUILD_NUMBER}"));
                     app.inside {
                         sh 'echo Hello, World!'
                     }
